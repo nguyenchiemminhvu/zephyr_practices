@@ -1,0 +1,31 @@
+menu "Test features"
+
+config ENABLE_FAILURE_TEST
+    bool "Enable failure testing"
+    default n
+    help
+        Enable this option to run system failure simulations.
+
+if ENABLE_FAILURE_TEST
+
+choice FAILURE_TEST_TYPE
+    prompt "Select the failure test type"
+    default ENABLE_STACK_OVERFLOW_TEST
+    help
+        Choose the specific failure mode to simulate
+
+config ENABLE_STACK_OVERFLOW_TEST
+    bool "Stack overflow test"
+    help
+        Do recursive function calls
+
+config ENABLE_CRASH_TEST
+    bool "Segmentfault test"
+    help
+        Do dereference pointers
+
+endchoice
+
+endif # ENABLE_FAILURE_TEST
+
+endmenu
