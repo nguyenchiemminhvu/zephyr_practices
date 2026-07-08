@@ -1,0 +1,39 @@
+menu "Choose thread test"
+
+config ENABLE_THREADS_TEST
+    bool "Enable multithreading testing"
+    default n
+    help
+        Enable thread testing type
+
+if ENABLE_THREADS_TEST
+
+choice THREAD_TEST_TYPE
+    prompt "Select the failure test type"
+    default STATIC_THREAD_TEST
+
+config STATIC_THREAD_TEST
+    bool "static"
+    help
+        static
+
+config DYNAMIC_THREAD_TEST
+    bool "dynamic"
+    help
+        dynamic
+
+config THREAD_SUSPEND_RESUME_TEST
+    bool "suspend and resume"
+    help
+        suspend and resume
+
+config THREAD_PREEMTION_TEST
+    bool "preemption"
+    help
+        preemption
+
+endchoice
+
+endif # ENABLE_THREADS_TEST
+
+endmenu
