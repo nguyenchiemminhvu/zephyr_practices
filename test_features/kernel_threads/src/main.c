@@ -114,6 +114,28 @@ void high_priority_thread_entry(void *p1, void *p2, void *p3)
 
 #endif // CONFIG_ENABLE_THREADS_TEST && CONFIG_THREAD_PREEMTION_TEST
 
+#if defined(CONFIG_ENABLE_THREADS_TEST) && defined(CONFIG_THREAD_YIELDING_TEST)
+K_THREAD_STACK_DEFINE(thread1_stack, THREAD_STACK_SIZE);
+K_THREAD_STACK_DEFINE(thread2_stack, THREAD_STACK_SIZE);
+struct k_thread thread1;
+struct k_thread thread2;
+
+void thread_entry(void *p1, void *p2, void *p3)
+{
+    ARG_UNUSED(p1);
+    ARG_UNUSED(p2);
+    ARG_UNUSED(p3);
+
+    while (1)
+    {
+        printk("Thread %p is running\n", k_current_get());
+        k_busy_wait(500000); // Simulate some work
+        k_yield();
+    }
+}
+
+#endif // CONFIG_ENABLE_THREADS_TEST && CONFIG_THREAD_YIELDING_TEST
+
 int main(void)
 {
 #if defined(CONFIG_ENABLE_THREADS_TEST) && defined(CONFIG_STATIC_THREAD_TEST)
@@ -214,6 +236,37 @@ int main(void)
     k_thread_abort(low_priority_thread_id);
     k_thread_abort(high_priority_thread_id);
     printk("Thread preemption demo completed\n");
+#endif
+
+#if defined(CONFIG_ENABLE_THREADS_TEST) && defined(CONFIG_THREAD_YIELDING_TEST)
+    printk("Running thread yielding demo\n");
+
+    k_tid_t thread1_id = k_thread_create(
+        &thread1,
+        thread1_stack,
+        K_THREAD_STACK_SIZEOF(thread1_stack),
+        thread_entry,
+        NULL, NULL, NULL,
+        THREAD_PRIORITY,
+        0,
+        K_NO_WAIT
+    );
+
+    k_tid_t thread2_id = k_thread_create(
+        &thread2,
+        thread2_stack,
+        K_THREAD_STACK_SIZEOF(thread2_stack),
+        thread_entry,
+        NULL, NULL, NULL,
+        THREAD_PRIORITY,
+        0,
+        K_NO_WAIT
+    );
+
+    k_sleep(K_MSEC(7000)); // Let the threads run for a while
+    k_thread_abort(thread1_id);
+    k_thread_abort(thread2_id);
+    printk("Thread yielding demo completed\n");
 #endif
 
     return 0;

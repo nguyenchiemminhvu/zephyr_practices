@@ -32,6 +32,11 @@ config THREAD_PREEMTION_TEST
     help
         preemption
 
+config THREAD_YIELDING_TEST
+    bool "yielding"
+    help
+        yielding
+
 endchoice
 
 endif # ENABLE_THREADS_TEST
