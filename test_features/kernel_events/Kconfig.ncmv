@@ -1,0 +1,31 @@
+menu "Test features"
+
+choice EVENT_SCENARIOS
+    prompt "Enable different kernel event scenarios"
+    default WAIT_ANY_LOGIC
+    help
+        Enable different kernel event scenarios
+
+config WAIT_ANY_LOGIC
+    bool "WAIT_ANY_LOGIC"
+    help
+        WAIT_ANY_LOGIC
+
+config WAIT_ALL_LOGIC
+    bool "WAIT_ALL_LOGIC"
+    help
+        WAIT_ALL_LOGIC
+
+config ONE_SRC_MANY_MONITORS_NO_CLEAR_BIT
+    bool "ONE_SRC_MANY_MONITORS_NO_CLEAR_BIT"
+    help
+        ONE_SRC_MANY_MONITORS_NO_CLEAR_BIT
+
+config ONE_SRC_MANY_MONITORS_WITH_CLEAR_BIT
+    bool "ONE_SRC_MANY_MONITORS_WITH_CLEAR_BIT"
+    help
+        ONE_SRC_MANY_MONITORS_WITH_CLEAR_BIT
+
+endchoice
+
+endmenu
