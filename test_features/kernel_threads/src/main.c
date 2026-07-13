@@ -159,6 +159,11 @@ int main(void)
     );
 
     k_sleep(K_MSEC(3000)); // Wait for the thread to run for a while
+
+    size_t free_space = 0;
+    k_thread_stack_space_get(thread_id, &free_space);
+    printk("Dynamic thread stack free space: %zu bytes\n", free_space);
+
     int join_rt = k_thread_join(thread_id, K_FOREVER);
     if (join_rt == 0)
     {
