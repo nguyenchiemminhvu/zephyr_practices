@@ -1,0 +1,41 @@
+menu "Test features"
+
+choice WORKQUEUE_TESTING
+    prompt "Select the test type"
+    default BASIC_WORK_QUEUE_TEST
+    help
+        Choose the specific simulation
+
+config BASIC_WORK_QUEUE_TEST
+    bool "BASIC_WORK_QUEUE_TEST"
+    help
+        BASIC_WORK_QUEUE_TEST
+
+config WORK_QUEUE_DELAY_TEST
+    bool "WORK_QUEUE_DELAY_TEST"
+    help
+        WORK_QUEUE_DELAY_TEST
+
+config WORK_QUEUE_POLL_TEST
+    bool "WORK_QUEUE_POLL_TEST"
+    help
+        WORK_QUEUE_POLL_TEST
+
+config CONTAINER_OF_TEST
+    bool "CONTAINER_OF_TEST"
+    help
+        CONTAINER_OF_TEST
+
+config ADDITIONAL_WORK_QUEUE_TEST
+    bool "ADDITIONAL_WORK_QUEUE_TEST"
+    help
+        ADDITIONAL_WORK_QUEUE_TEST
+
+config WORK_QUEUE_SYNC_TEST
+    bool "WORK_QUEUE_SYNC_TEST"
+    help
+        WORK_QUEUE_SYNC_TEST
+
+endchoice
+
+endmenu
