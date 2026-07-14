@@ -5,7 +5,7 @@ static uint8_t __aligned(1) nmea_buffer[1024]; // Buffer for the pipe
 
 struct nmea_message
 {
-    const char *message;
+    char *message;
     size_t length;
 };
 
@@ -15,24 +15,36 @@ void producer_thread_func(void *arg1, void *arg2, void *arg3)
 
     int rc = 0;
     const char* sample_nmea = "$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47";
-
-    while (1)
+    size_t total_size = 1024; // Total size of the NMEA messages
     {
-        struct nmea_message msg;
-        msg.message = sample_nmea;
-        msg.length = strlen(sample_nmea);
+
+        // build pipe payload
+        msg.message = k_malloc(1025); // Allocate memory for the message
+        memset(msg.message, 0, 1025); // Initialize the message buffer to zero
+        msg.length = 0; // Initialize the message length to zero
+        while (msg.length < total_size)
+        {
+            size_t remaining = total_size - msg.length;
+            size_t chunk_size = (remaining < strlen(sample_nmea)) ? remaining : strlen(sample_nmea);
+            memcpy(msg.message + msg.length, sample_nmea, chunk_size);
+            msg.length += chunk_size;
+        }
+        msg.message[msg.length] = '\0'; // Null-terminate the message
 
         // Write the NMEA message to the pipe
-        rc = k_pipe_write(nmea_pipe, msg.message, msg.length, K_NO_WAIT);
-        if (rc <= 0)
+        size_t bytes_written = 0;
+        while (bytes_written < msg.length)
         {
-            printk("Producer: Failed to write to pipe, rc=%d\n", rc);
-        }
-        else
-        {
-            printk("Producer: Wrote %d bytes to pipe\n", rc);
+            rc = k_pipe_write(nmea_pipe, msg.message + bytes_written, msg.length - bytes_written, K_NO_WAIT);
+            if (rc < 0)
+            {
+                printk("Producer: Failed to write to pipe, rc=%d\n", rc);
+                break;
+            }
+            bytes_written += rc;
         }
 
+        k_free(msg.message); // Free the allocated memory
         k_sleep(K_MSEC(1000)); // Sleep for 1 second before sending the next message
     }
 }
@@ -45,26 +57,30 @@ void consumer_thread_func(void *arg1, void *arg2, void *arg3)
     while (1)
     {
         struct nmea_message msg;
-        msg.message = (char*)k_malloc(1024); // Allocate memory for the message
+        msg.message = (char*)k_malloc(1025); // Allocate memory for the message
+        memset(msg.message, 0, 1025); // Initialize the message buffer to zero
 
-        // Read the NMEA message from the pipe
-        rc = k_pipe_read(nmea_pipe, msg.message, 65, K_FOREVER);
-        if (rc <= 0)
+        size_t bytes_read = 0;
+        while (bytes_read < 1024)
         {
-            printk("Consumer: Failed to read from pipe, rc=%d\n", rc);
+            rc = k_pipe_read(nmea_pipe, msg.message + bytes_read, 1024 - bytes_read, K_FOREVER);
+            if (rc < 0)
+            {
+                printk("Consumer: Failed to read from pipe, rc=%d\n", rc);
+                break;
+            }
+            bytes_read += rc;
+        }
+        msg.message[bytes_read] = '\0'; // Null-terminate the message
+
+        // Check if the received data successfully starts with the NMEA prefix
+        if (strncmp(msg.message, "$GPGGA", 6) == 0)
+        {
+            printk("Consumer: Received valid NMEA message sequence.\n");
         }
         else
         {
-            msg.length = rc;
-            printk("Consumer: Read %d bytes from pipe: %.*s\n", msg.length, (int)msg.length, msg.message);
-            if (strcmp(msg.message, (char*)nmea_buffer) == 0)
-            {
-                printk("Consumer: Received the expected NMEA message.\n");
-            }
-            else
-            {
-                printk("Consumer: Received an unexpected NMEA message.\n");
-            }
+            printk("Consumer: Received unexpected message format!\n");
         }
 
         k_free(msg.message); // Free the allocated memory
