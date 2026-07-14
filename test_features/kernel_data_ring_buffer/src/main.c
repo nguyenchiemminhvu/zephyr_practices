@@ -12,21 +12,21 @@ int main(void)
     uint8_t test_data[] = {1, 2, 3, 4, 5};
 
     for (int i = 0; i < sizeof(test_data); i++) {
-        ring_buf_put(&global_ringbuf, test_data[i]);
-        ring_buf_put(&local_ringbuf, test_data[i]);
+        ring_buf_put(&global_ringbuf, &test_data[i], 1);
+        ring_buf_put(&local_ringbuf, &test_data[i], 1);
     }
 
     printk("Global ring buffer contents:\n");
     uint8_t data;
-    while (ring_buf_get(&global_ringbuf, &data) == 0)
+    while (ring_buf_get(&global_ringbuf, &data, 1) > 0)
     {
-        printk("%d ", data);
+        printk("%d ", (int)data);
     }
 
     printk("\nLocal ring buffer contents:\n");
-    while (ring_buf_get(&local_ringbuf, &data) == 0)
+    while (ring_buf_get(&local_ringbuf, &data, 1) > 0)
     {
-        printk("%d ", data);
+        printk("%d ", (int)data);
     }
 
     return 0;
