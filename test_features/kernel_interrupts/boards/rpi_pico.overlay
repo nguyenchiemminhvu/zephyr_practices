@@ -1,0 +1,24 @@
+/ {
+    aliases {
+        sw-isr = &button_isr;
+        led-isr = &led_isr;
+    };
+
+    buttons {
+        compatible = "gpio-keys";
+        button_isr: button_0 {
+            /* GP14 pin 19 on Raspberry Pi Pico pinout */
+            gpios = <&gpio0 14 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+            label = "External Interrupt Button";
+        };
+    };
+
+    leds {
+        compatible = "gpio-leds";
+        led_isr: led_0 {
+            /* GP25 Onboard LED on Raspberry Pi Pico */
+            gpios = <&gpio0 25 GPIO_ACTIVE_HIGH>;
+            label = "Onboard Status LED";
+        };
+    };
+};
