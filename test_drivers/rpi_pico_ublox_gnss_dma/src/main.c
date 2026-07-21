@@ -9,46 +9,14 @@
 
 LOG_MODULE_REGISTER(main);
 
+static const struct device *gnss_uart_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_gnss_uart));
 static volatile uint32_t bytes_received = 0;
 static volatile uint32_t sentence_parsed = 0;
 
-static const struct device *gnss_uart_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_gnss_uart));
-
 RING_BUF_DECLARE(gnss_ringbuf, 512);
-
 K_SEM_DEFINE(gnss_sem, 0, 1);
 
-static void gnss_uart_irq_callback(const struct device *dev, void *user_data)
-{
-    timing_t start_time, end_time;
-    start_time = timing_counter_get();
-    
-    uart_irq_update(dev);
-    if (!uart_irq_rx_ready(dev))
-    {
-        return;
-    }
 
-    uint8_t local_buf[128];
-    memset(local_buf, 0, sizeof(local_buf));
-    int bytes_read = uart_fifo_read(dev, local_buf, sizeof(local_buf));
-    if (bytes_read > 0)
-    {
-        bytes_received += bytes_read;
-        if (ring_buf_put(&gnss_ringbuf, local_buf, bytes_read) < bytes_read)
-        {
-            LOG_WRN("Ring buffer overflow, some data lost");
-        }
-
-        k_sem_give(&gnss_sem);
-    }
-
-    end_time = timing_counter_get();
-    uint32_t cycles = timing_cycles_get(&start_time, &end_time);
-    uint32_t elapsed_time = timing_cycles_to_ns(cycles);
-    timing_stop();
-    printk("Read %d bytes in %u us\n", bytes_read, elapsed_time / 1000);
-}
 
 static char line_buf[256];
 static size_t line_pos = 0;
@@ -103,8 +71,8 @@ int main(void)
         return -1;
     }
 
-    uart_irq_callback_user_data_set(gnss_uart_dev, gnss_uart_irq_callback, NULL);
-    uart_irq_rx_enable(gnss_uart_dev);
+    // setup UART DMA RX (async API)
+
 
     while (1)
     {
