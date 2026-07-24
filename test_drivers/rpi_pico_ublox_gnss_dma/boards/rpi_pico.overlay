@@ -14,6 +14,7 @@
 &uart1 {
     status = "okay";
     current-speed = <9600>;
+    dma-coherent;
 
     pinctrl-0 = <&uart1_default>;
     pinctrl-names = "default";
