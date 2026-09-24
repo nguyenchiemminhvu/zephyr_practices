@@ -1,0 +1,7 @@
+source "Kconfig.zephyr"
+
+menu "NCMV custom Kconfig options"
+
+rsource "Kconfig.ncmv"
+
+endmenu

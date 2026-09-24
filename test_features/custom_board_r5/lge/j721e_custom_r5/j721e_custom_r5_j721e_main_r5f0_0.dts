@@ -1,0 +1,53 @@
+/dts-v1/;
+#include <ti/j721e_main_r5.dtsi>
+#include "j721e_custom_r5_j721e_main_r5f0_0-pinctrl.dtsi"
+
+/ {
+	model = "LGE TI J721E Custom Main R5 Board";
+	compatible = "lge,j721e-custom-r5", "ti,j721e-main-r5";
+
+	chosen {
+		/* Pointing system log and terminal framework to UART1 */
+		zephyr,console = &uart1;
+		zephyr,shell-uart = &uart1;
+
+		/*
+		 * ATCM is only 32K, too small for anything beyond a minimal
+		 * app. Run out of the DDR carve-out reserved for this R5F
+		 * core instead (matches the beaglebone_ai64 reference board).
+		 */
+		zephyr,sram = &ddr0;
+	};
+
+	cpus {
+		cpu@0 {
+			status = "okay";
+		};
+	};
+
+	/*
+	 * Placeholder DDR carve-out for this R5F core's code/data.
+	 * Replace address/size with the reserved-memory region assigned to
+	 * this core in your platform's memory map (e.g. the TIFS/DM
+	 * resource-allocation table or the Linux remoteproc reserved-memory
+	 * node for this R5F), so nothing else (Linux, other cores) writes
+	 * into it.
+	 */
+	ddr0: memory@a2000000 {
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = <0xa2000000 DT_SIZE_M(8)>;
+		zephyr,memory-region = "DRAM";
+	};
+};
+
+&uart1 {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&uart1_rx_default &uart1_tx_default>;
+	pinctrl-names = "default";
+};
+
+/* Required for SYS_CLOCK_EXISTS; disabled by default in the SoC dtsi */
+&systick_timer {
+	status = "okay";
+};

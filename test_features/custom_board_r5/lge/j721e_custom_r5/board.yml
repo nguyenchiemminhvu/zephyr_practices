@@ -1,0 +1,6 @@
+board:
+  name: j721e_custom_r5
+  full_name: LGE J721E Custom Main R5 Board
+  vendor: lge
+  socs:
+    - name: j721e

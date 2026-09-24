@@ -1,0 +1,20 @@
+menu "Test features"
+
+choice EVENT_SCENARIOS
+    prompt "Enable different cpp support test scenarios"
+    default CPP_SUPPORT_SIMPLE_TEST
+    help
+        Enable different cpp support test scenarios
+
+config CPP_SUPPORT_SIMPLE_TEST
+    bool "CPP_SUPPORT_SIMPLE_TEST"
+    help
+        CPP_SUPPORT_SIMPLE_TEST
+
+config CPP_SUPPORT_ADVANCED_TEST
+    bool "CPP_SUPPORT_ADVANCED_TEST"
+    help
+        CPP_SUPPORT_ADVANCED_TEST
+endchoice
+
+endmenu

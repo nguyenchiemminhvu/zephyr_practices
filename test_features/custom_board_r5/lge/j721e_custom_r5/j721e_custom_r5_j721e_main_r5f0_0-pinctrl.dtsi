@@ -1,0 +1,16 @@
+#include <zephyr/dt-bindings/pinctrl/ti-k3-pinctrl.h>
+
+&pinctrl {
+	/*
+	 * Map UART1 physical pins on your hardware layout.
+	 * Replace the hex offsets (0x1c0, 0x1c4) below with the exact hardware pad
+	 * register offsets from your physical J721E schematic/TRM.
+	 */
+	uart1_rx_default: uart1_rx_default {
+		pinmux = <K3_PINMUX(0x1c0, PIN_INPUT, MUX_MODE_0)>;
+	};
+
+	uart1_tx_default: uart1_tx_default {
+		pinmux = <K3_PINMUX(0x1c4, PIN_OUTPUT, MUX_MODE_0)>;
+	};
+};
